@@ -1,45 +1,25 @@
-<script>
-	import Header from '$lib/header/Header.svelte';
-	import '../app.css';
-</script>
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-2">
+	<div class="container justify-content-center">
+		<ul class="nav">
+			<li class="nav-item">
+				<a class="nav-link active" aria-current="page" href="/">Data</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="/contribute">Contribute</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="/documents">Documents</a>
+			</li>
+		</ul>
+	</div>
+</nav>
 
-<Header />
+<div class="container mb-4">
+<slot />
+</div>
 
-<main>
-	<slot />
-</main>
-
-<footer>
-	<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
-</footer>
-
-<style>
-	main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		width: 100%;
-		max-width: 1024px;
-		margin: 0 auto;
-		box-sizing: border-box;
-	}
-
-	footer {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		padding: 40px;
-	}
-
-	footer a {
-		font-weight: bold;
-	}
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 40px 0;
-		}
-	}
-</style>
+<div class="container-fluid bg-light justify-content-center py-2">
+	<figure class="text-center">
+		<blockquote class="blockquote"><p>Footer</p></blockquote>
+	</figure>
+</div>
