@@ -20,6 +20,7 @@
     "eslint": "^8.12.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-svelte3": "^4.0.0",
+    "faker": "^6.6.6",
     "prettier": "^2.5.1",
     "prettier-plugin-svelte": "^2.5.0",
     "svelte": "^3.48.0",
@@ -32,6 +33,7 @@
   "dependencies": {
     "@egjs/svelte-grid": "^1.10.1",
     "airtable": "^0.11.4",
+    "axios": "^0.27.2",
     "svelte-bricks": "^0.1.7",
     "svelte-masonry-layout": "^0.0.7",
     "sveltestrap": "^5.9.0"

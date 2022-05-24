@@ -1,6 +1,6 @@
 import Airtable from 'airtable';
 
-/** @type {import('./index').RequestHandler} */
+/** @type {import('./index.js.old').RequestHandler} */
 export async function get({ params }) {
 
     let result = await Raw();
