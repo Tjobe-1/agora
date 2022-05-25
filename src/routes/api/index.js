@@ -62,12 +62,16 @@ async function processRaw() {
     apObj.links = [];
     apObj.content = element.Content;
     apObj.title = element.Name;
+    apObj.image = element.Image;
 
-    apObj.meta.push("Participant: " + element.Participant);
+    if(element.Participant != null) {
 
-    if (element.Image.length > 0) {
-      apObj.image = element.Image[0].url;
+    apObj.meta.push("P: " + element.Participant);
     }
+
+
+      
+
 
 
     if (element.Analysis.length > 0) {
@@ -76,7 +80,10 @@ async function processRaw() {
       });
     }
 
+    if(apObj.title != "") {
+
     returnData.push(apObj);
+    }
   });
 
   return returnData;
