@@ -90,36 +90,20 @@
         bind:height
       >
         <div class="card">
+          <!-- Image -->
           {#if item.image != ""}
-            <a href="/#">
-              <img src={item.image} alt="images" class="card-img-top" />
-            </a>
+          <img class="card-img-top" src={item.image} alt="Here should be a pic">
           {/if}
-
           <div class="card-body">
+            <!-- Title -->
             <h5 class="card-title">{item.title}</h5>
 
+            <!-- Meta -->
             {#each item.meta as meta}
-              <a href="/#" class="card-link">
-                {meta}
-              </a>
+            {meta.name}
+            <a href="#" class="card-link">{meta.content}</a>
             {/each}
-
-            <hr />
-
-            {#if item.content != null}
-              <p class="card-text">{item.content}</p>
-            {/if}
           </div>
-          {#if item.links.length > 0}
-            <div class="card-footer">
-              {#each item.links as link}
-                {#if link != null}
-                  <a href="/#" class="card-link">{link}</a>
-                {/if}
-              {/each}
-            </div>
-          {/if}
         </div>
       </Masonry>
     </div> 
