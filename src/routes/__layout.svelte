@@ -7,7 +7,6 @@
 
     const handler = (e) => {
       carousel.scrollTo(carousel.scrollLeft + e.deltaY, 0);
-      console.log(carousel.scrollLeft);
       if (!scrollable) e.preventDefault();
     };
 

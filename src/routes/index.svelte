@@ -1,113 +1,180 @@
-<script context="module">
-  export const prerender = true;
-
-  export async function load({ fetch }) {
-    const res = await fetch("/api");
-
-    if (res.ok) return { props: { cards: await res.json() } };
-    return {
-      status: res.status,
-      error: new Error(),
-    };
-  }
-</script>
-
-<script lang="ts">
+<script>
   import Masonry from "svelte-bricks";
+  import Card from "./components/Card.svelte";
+  import { onMount } from "svelte";
+  import { page } from "$app/stores"
+  import { browser } from "$app/env";
 
   let [minColWidth, maxColWidth, gap] = [250, 800, 20];
   let width, height;
 
-  export let cards;
+  let current_filter = "";
+
+  let content_tables = [7, 8, 9];
+  let phases_table = 11;
+  let categories_table = 10;
+
+  let phases;
+
+
+
+  page.subscribe(() => {
+    console.log("oage")
+    phases = getPhases(current_filter);
+  })
+
+  async function getRelations(relation_array) {
+    if (browser) {
+      const result = await Promise.all(
+        relation_array.map(async (element) => {
+          let params = new URLSearchParams();
+          let table = element.table;
+          params.append("type", "relations");
+          params.append("table", table);
+          element.keys.forEach((key) => {
+            params.append("id", key.id);
+          });
+          var url = "/api/?";
+          const relation = await fetch(url + params.toString());
+          return relation.json();
+        })
+      );
+
+      const relation_result = [];
+
+      result.map((item) => {
+        item.forEach((subitem) => {
+          relation_result.push(subitem);
+        });
+      });
+
+      return relation_result;
+    }
+  }
+
+  async function getPhases(passed_filter) {
+    if (browser) {
+      let params = new URLSearchParams();
+      params.append("filter", passed_filter);
+      params.append("type", "rows");
+      params.append("table", phases_table);
+
+      var url = "/api/?";
+
+      const phases_promise = await fetch(url + params.toString());
+      return await phases_promise.json();
+    }
+  }
+
+  async function getRow(table, id) {
+    if (browser) {
+      let params = new URLSearchParams();
+      params.append("filter", "");
+      params.append("type", "row");
+      params.append("table", table);
+      params.append("row", id);
+
+      var url = "/api/?";
+
+      const phases_promise = await fetch(url + params.toString());
+      return await phases_promise.json();
+    }
+  }
 
   let items = [];
-  $: items = cards;
 
+  if (browser) {
+    let relationModal = document.getElementById("relationModal");
+
+    if(relationModal != null) {
+    relationModal.addEventListener("show.bs.modal", async function (event) {
+      items = [];
+      let button = event.relatedTarget;
+
+      let table = button.getAttribute("table");
+      let title = button.getAttribute("title");
+      let id = button.getAttribute("id");
+
+      let modalTitle = relationModal.querySelector(".modal-title");
+      let modalBody = relationModal.querySelector(".modal-body ");
+
+      modalTitle.textContent = title;
+
+      const row = await getRow(table, id);
+      const rel = await getRelations(row.relations);
+
+      items = rel;
+
+      //modalBody.innerHTML = "hi";
+    });
+  }
+  }
 </script>
 
+{#await phases}
+  <p>Waiting for data...</p>
+{:then results}
+  {#if results != undefined}
+    {#each results as phase}
+      <!-- Create columns -->
+      <div class="col-5 mh-100" style="overflow-y: scroll;">
+        <h1>{phase.title}</h1>
+        {#await getRelations(phase.relations)}
+          <p>Loading...</p>
+        {:then items}
+          {#if items != undefined}
+            <Masonry
+              {items}
+              {minColWidth}
+              {maxColWidth}
+              {gap}
+              let:item
+              bind:width
+              bind:height
+            >
+              <Card {item} />
+            </Masonry>
+          {/if}
+        {/await}
+      </div>
+    {/each}
+  {/if}
+{/await}
 
-
-    <div class="col-3 mh-100">
-      <div
-        class="btn-toolbar my-4 sticky-top sticky-offset"
-        role="toolbar"
-        aria-label="Toolbar with button groups"
-      >
-        <div class="btn-group me-4 mb-2" role="group" aria-label="First group">
-          <input
-            type="radio"
-            class="btn-check"
-            name="btnradio"
-            id="btnradio1"
-            autocomplete="off"
-            checked
-          />
-          <label class="btn btn-outline-secondary" for="btnradio1">Take</label>
-
-          <input
-            type="radio"
-            class="btn-check"
-            name="btnradio"
-            id="btnradio2"
-            autocomplete="off"
-          />
-          <label class="btn btn-outline-secondary" for="btnradio2"
-            >Another</label
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="relationModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        />
+      </div>
+      <div class="modal-body">
+        {#if items != undefined && items.length > 0}
+          <Masonry
+            {items}
+            {minColWidth}
+            {maxColWidth}
+            {gap}
+            let:item
+            bind:width
+            bind:height
           >
-
-          <input
-            type="radio"
-            class="btn-check"
-            name="btnradio"
-            id="btnradio3"
-            autocomplete="off"
-          />
-          <label class="btn btn-outline-secondary" for="btnradio3"
-            >Perspective</label
-          >
-        </div>
-        <div class="input-group me-4 mb-2">
-          <div class="input-group-text" id="btnGroupAddon">@</div>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Participant #"
-            aria-label="Input group example"
-            aria-describedby="btnGroupAddon"
-          />
-        </div>
+            <Card {item} />
+          </Masonry>
+        {/if}
       </div>
     </div>
-
-    <div class="col-5 mh-100" style="overflow-y: scroll;">
-      <Masonry
-        {items}
-        {minColWidth}
-        {maxColWidth}
-        {gap}
-        let:item
-        bind:width
-        bind:height
-      >
-        <div class="card">
-          <!-- Image -->
-          {#if item.image != ""}
-          <img class="card-img-top" src={item.image} alt="Here should be a pic">
-          {/if}
-          <div class="card-body">
-            <!-- Title -->
-            <h5 class="card-title">{item.title}</h5>
-
-            <!-- Meta -->
-            {#each item.meta as meta}
-            {meta.name}
-            <a href="#" class="card-link">{meta.content}</a>
-            {/each}
-          </div>
-        </div>
-      </Masonry>
-    </div> 
-
-    <div class="col-9 mh-100">
-      <h1>This is another column</h1>
-    </div>
+  </div>
+</div>

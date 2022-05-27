@@ -5,16 +5,12 @@ import axios from "axios";
 const URL = "https://agora-baserow.herokuapp.com/api/database/";
 const API_KEY = "2uSBXlWAJGjDabr7pWGX2gk63GOjznLQ";
 
-
 const headers = { headers: { authorization: "Token " + API_KEY } };
 
-async function getRows(table, filter) {
+async function getRows(table, filter, row) {
   try {
     const result = await axios.get(
-      URL+ "rows/table/" +
-        table +
-        "/?user_field_names=true&" +
-        filter,
+      URL + "rows/table/" + table + row + "/?user_field_names=true&" + filter,
       headers
     );
 
@@ -31,10 +27,7 @@ async function getRows(table, filter) {
 async function getFields(table, filter) {
   try {
     const result = await axios.get(
-      URL+ "fields/table/" +
-        table +
-        "/?" +
-        filter,
+      URL + "fields/table/" + table + "/?" + filter,
       headers
     );
 
@@ -48,10 +41,14 @@ async function getFields(table, filter) {
   }
 }
 
-
-async function processRows(table, filter) {
-  res = await getRows(table, filter);
+async function processRows(table, filter, row) {
+  res = await getRows(table, filter, row);
   returnData = [];
+
+  if (!Array.isArray(res.data.results)) {
+    res.data.results = [];
+    res.data.results[0] = res.data;
+  }
 
   res.data.results.forEach((element) => {
     apObj = {};
@@ -63,7 +60,7 @@ async function processRows(table, filter) {
         apObj.title = element[key];
       } else if (key.includes("Meta_")) {
         meta_el = {};
-        meta_el.name = key.replace('Meta_', '');
+        meta_el.name = key.replace("Meta_", "");
         meta_el.content = element[key];
         meta.push(meta_el);
       } else if (key == "Content_Text") {
@@ -103,21 +100,62 @@ async function processRows(table, filter) {
       }
     });
 
-    apObj.id = element.id;
+    apObj.tableid = element.id;
+    apObj.id = element.id.toString() + table.toString();
+    apObj.table = table;
     apObj.meta = meta;
-    apObj.relation = relations;
-
+    apObj.relations = relations;
 
     returnData.push(apObj);
   });
 
-  return returnData;
+  if (returnData.length > 1) {
+    return returnData;
+  } else {
+    return returnData[0];
+  }
 }
 
-export async function get() {
-  res = await processRows(7, "");
+export async function get(params) {
+  //console.log(params.url.searchParams);
+  let parameters = params.url.searchParams;
+  let filter = parameters.get("filter");
+  let type = parameters.get("type");
+  let table = parameters.get("table");
+  let row = parameters.get("row");
+  res = "";
+  let body_string ="";
 
+  if (type == "rows") {
+    res = await processRows(table, filter, "");
+
+  } else if (type == "relations") {
+    ids = [];
+    for (var pair of parameters.entries()) {
+      if (pair[0] == "id") {
+        row_id = pair[1];
+        row_str = "/" + row_id;
+        ids.push(row_str);
+      }
+    }
+    const result = await Promise.all(
+      ids.map(async(id) => {
+        const card = await processRows(table, filter, id);
+        return card;
+      })
+    )
+    res = result;
+  } else if (type == "row") {
+    id = "/" + row
+    res = await processRows(table, filter, id)
+  }
+
+
+  body_string = JSON.stringify(res);
   return {
-    body: res,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: body_string,
   };
 }
