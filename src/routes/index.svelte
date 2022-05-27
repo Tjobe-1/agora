@@ -18,24 +18,16 @@
   let [minColWidth, maxColWidth, gap] = [250, 800, 20];
   let width, height;
 
-  // export let result: string;
-  // let items = [];
-  // $: items = JSON.parse(result);
-
   export let cards;
 
   let items = [];
   $: items = cards;
+
 </script>
 
-<div bind:clientWidth={width} bind:clientHeight={height} />
 
 
-<h1>Welcome to Agora!</h1>
-
-<div class="container">
-  <div class="row">
-    <div class="sticky-top col-sm-3">
+    <div class="col-3 mh-100">
       <div
         class="btn-toolbar my-4 sticky-top sticky-offset"
         role="toolbar"
@@ -87,7 +79,7 @@
       </div>
     </div>
 
-    <div class="col-sm-9">
+    <div class="col-5 mh-100" style="overflow-y: scroll;">
       <Masonry
         {items}
         {minColWidth}
@@ -97,12 +89,11 @@
         bind:width
         bind:height
       >
-      
         <div class="card">
           {#if item.image != ""}
-          <a href="/#">
-            <img src={item.image} alt="images" class="card-img-top" />
-        </a>
+            <a href="/#">
+              <img src={item.image} alt="images" class="card-img-top" />
+            </a>
           {/if}
 
           <div class="card-body">
@@ -131,6 +122,8 @@
           {/if}
         </div>
       </Masonry>
+    </div> 
+
+    <div class="col-9 mh-100">
+      <h1>This is another column</h1>
     </div>
-  </div>
-</div>
