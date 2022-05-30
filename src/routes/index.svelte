@@ -2,33 +2,119 @@
   import Masonry from "svelte-bricks";
   import Card from "./components/Card.svelte";
   import { onMount } from "svelte";
-  import { page } from "$app/stores"
   import { browser } from "$app/env";
 
   let [minColWidth, maxColWidth, gap] = [250, 800, 20];
   let width, height;
 
-  let current_filter = "";
-
   let content_tables = [7, 8, 9];
+  let selected_content_tables = [];
+
   let phases_table = 11;
   let categories_table = 10;
 
+  let perspectives = [
+    {
+      name: "Street",
+      table: 7,
+    },
+    {
+      name: "System",
+      table: 8,
+    },
+    {
+      name: "Outsider",
+      table: 9,
+    },
+  ];
+
   let phases;
+  let categories;
+  let content_tables_fields;
+  let allcards;
 
+  let items = [];
+  let selectedCheckbox = [];
 
+  let phasesFilter = [];
 
-  page.subscribe(() => {
-    console.log("oage")
-    phases = getPhases(current_filter);
-  })
+  $: {
+    phasesFilter = [];
+    if (selectedCheckbox.length > 0 && selectedCheckbox != undefined) {
+      selectedCheckbox.forEach((selection) => {
+        const obj = {};
+        obj.field = "Rel_Category";
+        obj.filter = "link_row_has=";
+        obj.id = selection;
+        phasesFilter.push(obj);
+      });
+    }
+  }
+  
+  $: allcards = contentRelations(selected_content_tables, phasesFilter);
+  $: allcards = contentRelations("", phasesFilter);
 
-  async function getRelations(relation_array) {
+  onMount(() => {
+    phases = getTableRows(phases_table, "");
+    categories = getTableRows(categories_table, "");
+    content_tables_fields = getFields(content_tables);
+    allcards = contentRelations("", phasesFilter);
+
+    if (browser) {
+      let relationModal = document.getElementById("relationModal");
+      if (relationModal != null) {
+        relationModal.addEventListener("show.bs.modal", async function (event) {
+          assembleModal(event);
+        });
+      }
+    }
+  });
+
+  async function get_field_id(table, field_name, fields) {
+    let id;
+    fields.forEach((i_table) => {
+      if (i_table[0].table_id == table) {
+        i_table.forEach((field) => {
+          if (field.name == field_name) {
+            id = field.id;
+          }
+        });
+      }
+    });
+    return id;
+  }
+
+  async function assemble_filter(table, field_name, query) {
+    let fields = await content_tables_fields;
+    let thafield = await get_field_id(table, field_name, fields);
+    let filter_string = "filter__field_" + thafield + "__" + query + "&";
+    return filter_string;
+  }
+
+  async function getFields(table_array) {
+    if (browser) {
+      const result = await Promise.all(
+        table_array.map(async (table) => {
+          let params = new URLSearchParams();
+          params.append("filter", "");
+          params.append("type", "fields");
+          params.append("table", table);
+          var url = "/api/?";
+          const relation = await fetch(url + params.toString());
+          return await relation.json();
+        })
+      );
+      return await result;
+    }
+  }
+
+  async function rowRelations(relation_array, passed_filter) {
     if (browser) {
       const result = await Promise.all(
         relation_array.map(async (element) => {
           let params = new URLSearchParams();
           let table = element.table;
+          params.append("filter", passed_filter);
           params.append("type", "relations");
           params.append("table", table);
           element.keys.forEach((key) => {
@@ -43,26 +129,82 @@
       const relation_result = [];
 
       result.map((item) => {
-        item.forEach((subitem) => {
-          relation_result.push(subitem);
-        });
+        if (Array.isArray(item)) {
+          item.forEach((subitem) => {
+            relation_result.push(subitem);
+          });
+        } else {
+          if (Object.keys(item).length > 0) {
+            relation_result.push(item);
+          }
+        }
       });
 
       return relation_result;
     }
   }
 
-  async function getPhases(passed_filter) {
+  async function contentRelations(id, passed_filter) {
+    if (browser) {
+      let tables_to_check = [];
+        if(selected_content_tables.length > 0) {
+          tables_to_check = selected_content_tables;
+        } else {
+          tables_to_check = content_tables;
+        }
+      const result = await Promise.all(
+        tables_to_check.map(async (table) => {
+          let params = new URLSearchParams();
+          let filter = "";
+
+          if (Array.isArray(passed_filter) && passed_filter.length > 0) {
+            for (var i = 0; i < passed_filter.length; i++) {
+              filter += await assemble_filter(
+                table,
+                passed_filter[i].field,
+                passed_filter[i].filter + passed_filter[i].id
+              );
+            }
+            filter += "filter_type_OR";
+          }
+
+          params.append("filter", filter);
+          params.append("type", "filter_rows");
+          params.append("table", table);
+          var url = "/api/?";
+          const relation = await fetch(url + params.toString());
+          return relation.json();
+        })
+      );
+      const relation_result = [];
+
+      result.map((item) => {
+        if (Array.isArray(item)) {
+          item.forEach((subitem) => {
+            relation_result.push(subitem);
+          });
+        } else {
+          if (Object.keys(item).length > 0) {
+            relation_result.push(item);
+          }
+        }
+      });
+
+      return relation_result;
+    }
+  }
+
+  async function getTableRows(table, passed_filter) {
     if (browser) {
       let params = new URLSearchParams();
       params.append("filter", passed_filter);
       params.append("type", "rows");
-      params.append("table", phases_table);
+      params.append("table", table);
 
       var url = "/api/?";
 
-      const phases_promise = await fetch(url + params.toString());
-      return await phases_promise.json();
+      const res_promise = await fetch(url + params.toString());
+      return await res_promise.json();
     }
   }
 
@@ -81,35 +223,93 @@
     }
   }
 
-  let items = [];
-
-  if (browser) {
-    let relationModal = document.getElementById("relationModal");
-
-    if(relationModal != null) {
-    relationModal.addEventListener("show.bs.modal", async function (event) {
-      items = [];
-      let button = event.relatedTarget;
-
-      let table = button.getAttribute("table");
-      let title = button.getAttribute("title");
-      let id = button.getAttribute("id");
-
-      let modalTitle = relationModal.querySelector(".modal-title");
-      let modalBody = relationModal.querySelector(".modal-body ");
-
-      modalTitle.textContent = title;
-
-      const row = await getRow(table, id);
-      const rel = await getRelations(row.relations);
-
-      items = rel;
-
-      //modalBody.innerHTML = "hi";
-    });
+  function checkPhase(item, phase) {
+    const rel = item.relations.find((element) => element.table == phases_table);
+    let key;
+    if (rel != undefined) {
+      key = rel.keys.find((element) => element.id == phase);
+    }
+    if (key != undefined) {
+      return true;
+    } else {
+      return false;
+    }
   }
+
+  async function assembleModal(event) {
+    items = [];
+
+    let button = event.relatedTarget;
+
+    let table = button.getAttribute("table");
+    let title = button.getAttribute("title");
+    let id = button.getAttribute("id");
+
+    let modalTitle = relationModal.querySelector(".modal-title");
+    let modalBody = relationModal.querySelector(".modal-body ");
+
+    modalTitle.textContent = title;
+
+    const row = await getRow(table, id);
+    const rel = await rowRelations(row.relations, "");
+    items = rel;
   }
 </script>
+
+<div
+  class="col-2 mh-100 position-fixed bg-white"
+  style="overflow-y: hidden; z-index:1030"
+>
+  <div
+    class="btn-toolbar"
+    role="toolbar"
+    aria-label="Toolbar with button groups"
+  >
+    <div class="btn-group me-2 mb-4 flex-wrap" role="group" aria-label="First group">
+      {#await categories}
+        <p>waiting</p>
+      {:then category}
+        {#if category != undefined}
+          {#each category as cat}
+            <input
+              type="checkbox"
+              class="btn-check"
+              id={cat.title}
+              autocomplete="off"
+              bind:group={selectedCheckbox}
+              value={cat.tableid}
+            />
+            <label class="btn btn-outline-primary" for={cat.title}
+              >{cat.title}</label
+            >
+          {/each}
+        {/if}
+      {/await}
+    </div>
+    <hr />
+    <div
+      class="btn-group me-2 flex-wrap"
+      role="group"
+      aria-label="Second group"
+    >
+    {#if perspectives != undefined}
+      {#each perspectives as perspective}
+        <input
+          type="checkbox"
+          class="btn-check"
+          id={perspective.name}
+          autocomplete="off"
+          bind:group={selected_content_tables}
+          value={perspective.table}
+        />
+        <label class="btn btn-outline-primary" for={perspective.name}>{perspective.name}</label>
+      {/each}
+    {/if}
+    </div>
+  </div>
+</div>
+
+<div class="col-1 mh-100 offset-1" />
 
 {#await phases}
   <p>Waiting for data...</p>
@@ -119,7 +319,7 @@
       <!-- Create columns -->
       <div class="col-5 mh-100" style="overflow-y: scroll;">
         <h1>{phase.title}</h1>
-        {#await getRelations(phase.relations)}
+        {#await allcards}
           <p>Loading...</p>
         {:then items}
           {#if items != undefined}
@@ -132,7 +332,9 @@
               bind:width
               bind:height
             >
-              <Card {item} />
+              {#if checkPhase(item, phase.tableid)}
+                <Card {item} />
+              {/if}
             </Masonry>
           {/if}
         {/await}

@@ -32,7 +32,7 @@ async function getFields(table, filter) {
     );
 
     if (result.status == 200) {
-      return result;
+      return result.data;
     } else {
       console.log(error);
     }
@@ -148,6 +148,11 @@ export async function get(params) {
   } else if (type == "row") {
     id = "/" + row
     res = await processRows(table, filter, id)
+  } else if (type == "filter_rows") {
+    res = await processRows(table, filter, "")
+  } else if (type == "fields") {
+    res = await getFields(table, filter)
+
   }
 
 
