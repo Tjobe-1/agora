@@ -1,49 +1,57 @@
 <script>
-    export let item;
+  export let item;
+  let perspective;
+  let category;
+
+  switch (item.table) {
+    case "7":
+      perspective = "perspective-street";
+      console.log("street");
+      break;
+    case "8":
+      perspective = "perspective-system";
+      break;
+    case "9":
+      perspective = "perspective-outsider";
+      break;
+  }
+
+  item.relations.forEach(relation => {
+    if(relation.table == 10) {
+      relation.keys.forEach(key => {
+        category = key.title;
+      })
+    }
+  })
+
+  console.log(item.table);
 </script>
 
-<div class="card border-primary">
-    <!-- Image -->
-    {#if item.image != ""}
-      <img
-        class="card-img-top"
-        src={item.image}
-        alt="Here should be a pic"
-      />
-    {/if}
-    <div class="card-body">
+<div class="col">
+  <div class="card text-center h-100 text-white {perspective}">
+    <div class="card-header bg-transparent border-0">
+      {category.toUpperCase()}
+    </div>
+
+    <div class="card-body ">
       <!-- Title -->
+
       <h5 class="card-title">{item.title}</h5>
 
       <!-- Meta -->
-      {#each item.meta as meta}
-        {meta.name}
-        <a href="#" class="card-link">{meta.content}</a>
-      {/each}
-
-      {#if item.text != ""}
-        <hr />
-        <p>{item.text}</p>
-      {/if}
     </div>
 
     <div class="card-footer">
-      {#each item.relations as relation}
-        {#if relation.table == 10}
-          {#each relation.keys as key}
-            <button
-              type="button"
-              class="btn btn-primary"
-              data-bs-toggle="modal"
-              data-bs-target="#relationModal"
-              table={relation.table}
-              title={key.title}
-              id={key.id}
-            >
-              {key.title}
-            </button>
-          {/each}
-        {/if}
-      {/each}
+      <div class="circle {perspective}">1</div>
+      <div class="circle {perspective}">3</div>
+      <a
+        href=""
+        class="stretched-link"
+        data-bs-toggle="modal"
+        data-bs-target="#relationModal"
+        title={category}
+        id={item.id}
+      />
     </div>
   </div>
+</div>

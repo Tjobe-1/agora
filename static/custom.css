@@ -1,3 +1,84 @@
-.sticky-offset {
-    top: 30px;
-  }
+:root{
+  --bg: #feeede;
+  --border-color: rgb(58, 45, 57);
+  --card-border-width: 2px;
+}
+
+.perspective-street {
+  border: var(--card-border-width) solid var(--border-color);
+  background-color: #f15152;
+
+}
+
+.perspective-system {
+  border: var(--card-border-width) solid var(--border-color);
+  background-color: #5dab7d;
+
+}
+
+.perspective-outsider {
+  border: var(--card-border-width) solid var(--border-color);
+  background-color: #f59507;
+
+}
+
+.card-footer {
+  background-color: var(--bg);
+  border-top: var(--card-border-width) solid var(--border-color);
+}
+
+.circle {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  display: inline-flex; /* or inline-flex */
+  align-items: center; 
+  justify-content: center;
+}
+
+.btn-menu {
+  color: var(--border-color);
+  border-color: var(--border-color);
+}
+
+.btn-menu:hover, .btn-menu:focus, .btn-menu:active, .btn-menu:active, .btn-menu:checked, .btn-check:active+.btn, .btn-check:checked+.btn {
+  color: white;
+  background-color: var(--border-color);
+  --bs-btn-active-bg: green;
+}
+
+#menu {
+  background-color: var(--bg);
+  border-right: var(--card-border-width) solid var(--border-color);
+  box-shadow: 0px 0px 8px 0px;
+  z-index: 1000;
+}
+
+.menu-container {
+  border: var(--card-border-width) solid var(--border-color);
+  border-radius: 10px;
+}
+
+body {
+  font-family: proxima-nova, sans-serif;
+  font-weight: 400;
+  font-style: normal; 
+  background-color: var(--bg);
+}
+
+h1 {
+  font-family: proxima-nova, sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+  ::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 15px;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: rgba(0,0,0,.5);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}

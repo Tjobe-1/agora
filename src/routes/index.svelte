@@ -3,6 +3,7 @@
   import Card from "./components/Card.svelte";
   import { onMount } from "svelte";
   import { browser } from "$app/env";
+  import aroga_logo from './components/agora_logo.svg'
 
   let [minColWidth, maxColWidth, gap] = [250, 800, 20];
   let width, height;
@@ -50,7 +51,7 @@
       });
     }
   }
-  
+
   $: allcards = contentRelations(selected_content_tables, phasesFilter);
   $: allcards = contentRelations("", phasesFilter);
 
@@ -147,11 +148,11 @@
   async function contentRelations(id, passed_filter) {
     if (browser) {
       let tables_to_check = [];
-        if(selected_content_tables.length > 0) {
-          tables_to_check = selected_content_tables;
-        } else {
-          tables_to_check = content_tables;
-        }
+      if (selected_content_tables.length > 0) {
+        tables_to_check = selected_content_tables;
+      } else {
+        tables_to_check = content_tables;
+      }
       const result = await Promise.all(
         tables_to_check.map(async (table) => {
           let params = new URLSearchParams();
@@ -165,7 +166,7 @@
                 passed_filter[i].filter + passed_filter[i].id
               );
             }
-            filter += "filter_type_OR";
+            filter += "filter_type=OR";
           }
 
           params.append("filter", filter);
@@ -256,92 +257,118 @@
   }
 </script>
 
-<div
-  class="col-2 mh-100 position-fixed bg-white"
-  style="overflow-y: hidden; z-index:1030"
->
-  <div
-    class="btn-toolbar"
-    role="toolbar"
-    aria-label="Toolbar with button groups"
-  >
-    <div class="btn-group me-2 mb-4 flex-wrap" role="group" aria-label="First group">
+<div class="container-fluid vh-100 d-flex flex-column">
+  <div class="row flex-nowrap h-100">
+  <div class="col-2 mh-100 h-100" id="menu">
+    <object data={aroga_logo} width=100% class="mt-2"></object>
+    <div class="container menu-container">
+      <h2 class="mt-2 text-center">Filter</h2>
+    <div
+      class="btn-toolbar mt-2"
+      role="toolbar"
+      aria-label="Toolbar with button groups"
+    >
       {#await categories}
         <p>waiting</p>
       {:then category}
         {#if category != undefined}
           {#each category as cat}
-            <input
-              type="checkbox"
-              class="btn-check"
-              id={cat.title}
-              autocomplete="off"
-              bind:group={selectedCheckbox}
-              value={cat.tableid}
-            />
-            <label class="btn btn-outline-primary" for={cat.title}
-              >{cat.title}</label
+            <div
+              class="btn-group me-2 mb-2 flex-wrap"
+              role="group"
+              aria-label="First group"
             >
+              <input
+                type="checkbox"
+                class="btn-check"
+                id={cat.title}
+                autocomplete="off"
+                bind:group={selectedCheckbox}
+                value={cat.tableid}
+              />
+              <label class="btn btn-menu" for={cat.title}
+                >{cat.title}</label
+              >
+            </div>
           {/each}
         {/if}
       {/await}
     </div>
-    <hr />
     <div
-      class="btn-group me-2 flex-wrap"
-      role="group"
-      aria-label="Second group"
+      class="btn-toolbar my-4"
+      role="toolbar"
+      aria-label="Toolbar with button groups"
     >
-    {#if perspectives != undefined}
-      {#each perspectives as perspective}
-        <input
-          type="checkbox"
-          class="btn-check"
-          id={perspective.name}
-          autocomplete="off"
-          bind:group={selected_content_tables}
-          value={perspective.table}
-        />
-        <label class="btn btn-outline-primary" for={perspective.name}>{perspective.name}</label>
-      {/each}
-    {/if}
-    </div>
-  </div>
-</div>
-
-<div class="col-1 mh-100 offset-1" />
-
-{#await phases}
-  <p>Waiting for data...</p>
-{:then results}
-  {#if results != undefined}
-    {#each results as phase}
-      <!-- Create columns -->
-      <div class="col-5 mh-100" style="overflow-y: scroll;">
-        <h1>{phase.title}</h1>
-        {#await allcards}
-          <p>Loading...</p>
-        {:then items}
-          {#if items != undefined}
-            <Masonry
-              {items}
-              {minColWidth}
-              {maxColWidth}
-              {gap}
-              let:item
-              bind:width
-              bind:height
+      {#if perspectives != undefined}
+        {#each perspectives as perspective}
+          <div
+            class="btn-group me-2 mb-2 flex-wrap"
+            role="group"
+            aria-label="Second group"
+          >
+            <input
+              type="checkbox"
+              class="btn-check"
+              id={perspective.name}
+              autocomplete="off"
+              bind:group={selected_content_tables}
+              value={perspective.table}
+            />
+            <label class="btn btn-menu" for={perspective.name}
+              >{perspective.name}</label
             >
-              {#if checkPhase(item, phase.tableid)}
-                <Card {item} />
-              {/if}
-            </Masonry>
+          </div>
+        {/each}
+      {/if}
+    </div>
+    
+  </div>
+  <div class="container my-4 menu-container">
+    <h2 class="my-2 text-center">Pages</h2>
+  </div> 
+  </div>
+
+  <div class="col-10 mh-100 h-100" style="overflow-x:scroll; height: 100vh">
+    <div class="container-fluid d-flex flex-column" style="height:100%">
+      <div class="row flex-nowrap h-100">
+        {#await phases}
+          <p>Waiting for data...</p>
+        {:then results}
+          {#if results != undefined}
+            {#each results as phase}
+              <!-- Create columns -->
+              <div
+                class="col-7 mh-100 me-5"
+                style="overflow-y:hidden"
+              >
+                <h1>{phase.title}</h1>
+                {#await allcards}
+                  <p>Loading...</p>
+                {:then items}
+                  {#if items != undefined}
+                    <div
+                      class="container-fluid"
+                      style="height: 90%; overflow-y:scroll"
+                    >
+                      <div class="row row-cols-1 row-cols-md-3 g-4">
+                        {#each items as item}
+                          {#if checkPhase(item, phase.tableid)}
+                            <Card {item} />
+                          {/if}
+                        {/each}
+                      </div>
+                    </div>
+                  {/if}
+                {/await}
+              </div>
+            {/each}
           {/if}
         {/await}
       </div>
-    {/each}
-  {/if}
-{/await}
+    </div>
+  </div>
+</div>
+</div>
 
 <!-- Modal -->
 <div
