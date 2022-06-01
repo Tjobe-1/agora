@@ -4,6 +4,7 @@
   import { onMount } from "svelte";
   import { browser } from "$app/env";
   import aroga_logo from "./components/agora_logo.svg";
+  import Contribute from "./contribute.svelte";
 
   let [minColWidth, maxColWidth, gap] = [250, 800, 20];
   let width, height;
@@ -35,6 +36,7 @@
   let allcards;
 
   let modalItems;
+  let modalItem;
   let selectedCheckbox = [];
 
   let phasesFilter = [];
@@ -62,12 +64,13 @@
     allcards = contentRelations("", phasesFilter);
 
     if (browser) {
-      let relationModal = document.getElementById("relationModal");
-      if (relationModal != null) {
-        relationModal.addEventListener("show.bs.modal", async function (event) {
-          assembleModal(event);
-        });
+      if (window.location.hash.includes("#")) {
+        assembleModal(window.location.href);
       }
+
+      window.addEventListener("hashchange", (event) => {
+        assembleModal(window.location.href);
+      });
     }
   });
 
@@ -237,21 +240,36 @@
     }
   }
 
-  async function assembleModal(event) {
-    let pushItems = []
+  async function assembleModal(url) {
     modalItems = undefined;
+    modalItem = undefined;
 
-    let button = event.relatedTarget;
 
-    let table = button.getAttribute("table");
-    let title = button.getAttribute("title");
-    let item = JSON.parse(button.getAttribute("item"));
-    console.log(item);
+    const urlObj = new URL(url)
+    let params = new URLSearchParams(urlObj.hash.substring(1))
+
+    let table = params.get("table")
+    let id = params.get("id")
+    let title = params.get("title")
+
+
+    var myModal = new bootstrap.Modal(
+      document.getElementById("relationModal"),
+      ""
+    );
 
     let modalTitle = relationModal.querySelector(".modal-title");
     let modalBody = relationModal.querySelector(".modal-body ");
 
     modalTitle.textContent = title;
+    myModal.show();
+
+    const item = await getRow(table, id)
+    modalItem = await item;
+
+
+    let pushItems = [];
+    
 
     for (var i = 0; i < item.relations.length; i++) {
       if (content_tables.includes(item.relations[i].table)) {
@@ -262,8 +280,8 @@
         }
       }
     }
-    
-    modalItems = pushItems
+
+    modalItems = pushItems;
   }
 </script>
 
@@ -348,7 +366,10 @@
             {#if results != undefined}
               {#each results as phase}
                 <!-- Create columns -->
-                <div class="col-12 col-md-10 col-lg-10 col-xl-8 mh-100 me-5" style="overflow-y:hidden">
+                <div
+                  class="col-12 col-md-10 col-lg-10 col-xl-8 mh-100 me-5"
+                  style="overflow-y:hidden"
+                >
                   <h1>{phase.title}</h1>
                   {#await allcards}
                     <p>Loading...</p>
@@ -358,7 +379,9 @@
                         class="container-fluid p-0 pe-2"
                         style="height: 90%; width:100%; overflow-y:scroll; overflow-x:hidden;"
                       >
-                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxl-3 g-4">
+                        <div
+                          class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxl-3 g-4"
+                        >
                           {#each items as item}
                             {#if checkPhase(item, phase.tableid)}
                               <Card {item} />
@@ -381,10 +404,6 @@
       </div>
     </div>
   </div>
-</div>
-
-<div id="test">
-  hello
 </div>
 
 <!-- Modal -->

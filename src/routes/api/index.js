@@ -117,6 +117,7 @@ async function processRows(table, filter, row) {
 }
 
 export async function get(params) {
+  //console.log(params.url)
   //console.log(params.url.searchParams);
   let parameters = params.url.searchParams;
   let filter = parameters.get("filter");

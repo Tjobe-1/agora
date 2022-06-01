@@ -7,7 +7,7 @@
   let circles = [];
 
   function getTablePerspective(table) {
-    let tableInt = parseInt(table)
+    let tableInt = parseInt(table);
     switch (tableInt) {
       case 7:
         return "perspective-street";
@@ -29,10 +29,12 @@
         category = key.title;
       });
     } else if (content_tables.includes(relation.table)) {
-      let circle = {}
-      circle.perspective = getTablePerspective(relation.table)
+      let circle = {};
+      circle.perspective = getTablePerspective(relation.table);
       circle.amount = relation.keys.length;
-      if(circle.amount > 0) {circles.push(circle)}
+      if (circle.amount > 0) {
+        circles.push(circle);
+      }
     }
   });
 </script>
@@ -51,7 +53,7 @@
       <!-- Meta -->
     </div>
 
-    <a
+    <!-- <a
         style=""
         class="stretched-link"
         data-bs-dismiss="modal"
@@ -59,22 +61,20 @@
         data-bs-target="#relationModal"
         title={category}
         item={JSON.stringify(item)}
-      />
+      /> -->
 
-      <!-- <a
+    <a
       style=""
       class="stretched-link"
-      data-bs-dismiss="modal"
-      data-bs-toggle="modal"
-      href="#relationModal"
-    /> -->
-    
-{#if circles.length > 0}
-    <div class="card-footer">
-      {#each circles as circle}
-      <div class="circle {circle.perspective} mx-1">{circle.amount}</div>
-      {/each}
-    </div>
+      href={"#table=" + item.table + "&id=" + item.tableid + "&title=" + item.title}
+    />
+
+    {#if circles.length > 0}
+      <div class="card-footer">
+        {#each circles as circle}
+          <div class="circle {circle.perspective} mx-1">{circle.amount}</div>
+        {/each}
+      </div>
     {/if}
   </div>
 </div>
