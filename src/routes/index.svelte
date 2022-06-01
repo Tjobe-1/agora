@@ -3,7 +3,7 @@
   import Card from "./components/Card.svelte";
   import { onMount } from "svelte";
   import { browser } from "$app/env";
-  import aroga_logo from './components/agora_logo.svg'
+  import aroga_logo from "./components/agora_logo.svg";
 
   let [minColWidth, maxColWidth, gap] = [250, 800, 20];
   let width, height;
@@ -34,7 +34,7 @@
   let content_tables_fields;
   let allcards;
 
-  let items = [];
+  let modalItems;
   let selectedCheckbox = [];
 
   let phasesFilter = [];
@@ -238,136 +238,153 @@
   }
 
   async function assembleModal(event) {
-    items = [];
+    let pushItems = []
+    modalItems = undefined;
 
     let button = event.relatedTarget;
 
     let table = button.getAttribute("table");
     let title = button.getAttribute("title");
-    let id = button.getAttribute("id");
+    let item = JSON.parse(button.getAttribute("item"));
+    console.log(item);
 
     let modalTitle = relationModal.querySelector(".modal-title");
     let modalBody = relationModal.querySelector(".modal-body ");
 
     modalTitle.textContent = title;
 
-    const row = await getRow(table, id);
-    const rel = await rowRelations(row.relations, "");
-    items = rel;
+    for (var i = 0; i < item.relations.length; i++) {
+      if (content_tables.includes(item.relations[i].table)) {
+        for (var j = 0; j < item.relations[i].keys.length; j++) {
+          pushItems.push(
+            await getRow(item.relations[i].table, item.relations[i].keys[j].id)
+          );
+        }
+      }
+    }
+    
+    modalItems = pushItems
   }
 </script>
 
 <div class="container-fluid vh-100 d-flex flex-column">
   <div class="row flex-nowrap h-100">
-  <div class="col-2 mh-100 h-100" id="menu">
-    <object data={aroga_logo} width=100% class="mt-2"></object>
-    <div class="container menu-container">
-      <h2 class="mt-2 text-center">Filter</h2>
-    <div
-      class="btn-toolbar mt-2"
-      role="toolbar"
-      aria-label="Toolbar with button groups"
-    >
-      {#await categories}
-        <p>waiting</p>
-      {:then category}
-        {#if category != undefined}
-          {#each category as cat}
-            <div
-              class="btn-group me-2 mb-2 flex-wrap"
-              role="group"
-              aria-label="First group"
-            >
-              <input
-                type="checkbox"
-                class="btn-check"
-                id={cat.title}
-                autocomplete="off"
-                bind:group={selectedCheckbox}
-                value={cat.tableid}
-              />
-              <label class="btn btn-menu" for={cat.title}
-                >{cat.title}</label
-              >
-            </div>
-          {/each}
-        {/if}
-      {/await}
-    </div>
-    <div
-      class="btn-toolbar my-4"
-      role="toolbar"
-      aria-label="Toolbar with button groups"
-    >
-      {#if perspectives != undefined}
-        {#each perspectives as perspective}
-          <div
-            class="btn-group me-2 mb-2 flex-wrap"
-            role="group"
-            aria-label="Second group"
-          >
-            <input
-              type="checkbox"
-              class="btn-check"
-              id={perspective.name}
-              autocomplete="off"
-              bind:group={selected_content_tables}
-              value={perspective.table}
-            />
-            <label class="btn btn-menu" for={perspective.name}
-              >{perspective.name}</label
-            >
-          </div>
-        {/each}
-      {/if}
-    </div>
-    
-  </div>
-  <div class="container my-4 menu-container">
-    <h2 class="my-2 text-center">Pages</h2>
-  </div> 
-  </div>
-
-  <div class="col-10 mh-100 h-100" style="overflow-x:scroll; height: 100vh">
-    <div class="container-fluid d-flex flex-column" style="height:100%">
-      <div class="row flex-nowrap h-100">
-        {#await phases}
-          <p>Waiting for data...</p>
-        {:then results}
-          {#if results != undefined}
-            {#each results as phase}
-              <!-- Create columns -->
+    <div class="col-2 mh-100 h-100" id="menu">
+      <object data={aroga_logo} width="100%" class="mt-2" />
+      <div class="container menu-container">
+        <h2 class="mt-2 text-center">Filter</h2>
+        <div
+          class="btn-toolbar mt-2"
+          role="toolbar"
+          aria-label="Toolbar with button groups"
+        >
+          {#await categories}
+            <p>waiting</p>
+          {:then category}
+            {#if category != undefined}
+              {#each category as cat}
+                <div
+                  class="btn-group me-2 mb-2 flex-wrap"
+                  role="group"
+                  aria-label="First group"
+                >
+                  <input
+                    type="checkbox"
+                    class="btn-check"
+                    id={cat.title}
+                    autocomplete="off"
+                    bind:group={selectedCheckbox}
+                    value={cat.tableid}
+                  />
+                  <label class="btn btn-menu" for={cat.title}>{cat.title}</label
+                  >
+                </div>
+              {/each}
+            {/if}
+          {/await}
+        </div>
+        <div
+          class="btn-toolbar my-4"
+          role="toolbar"
+          aria-label="Toolbar with button groups"
+        >
+          {#if perspectives != undefined}
+            {#each perspectives as perspective}
               <div
-                class="col-7 mh-100 me-5"
-                style="overflow-y:hidden"
+                class="btn-group me-2 mb-2 flex-wrap"
+                role="group"
+                aria-label="Second group"
               >
-                <h1>{phase.title}</h1>
-                {#await allcards}
-                  <p>Loading...</p>
-                {:then items}
-                  {#if items != undefined}
-                    <div
-                      class="container-fluid"
-                      style="height: 90%; overflow-y:scroll"
-                    >
-                      <div class="row row-cols-1 row-cols-md-3 g-4">
-                        {#each items as item}
-                          {#if checkPhase(item, phase.tableid)}
-                            <Card {item} />
-                          {/if}
-                        {/each}
-                      </div>
-                    </div>
-                  {/if}
-                {/await}
+                <input
+                  type="checkbox"
+                  class="btn-check"
+                  id={perspective.name}
+                  autocomplete="off"
+                  bind:group={selected_content_tables}
+                  value={perspective.table}
+                />
+                <label class="btn btn-menu" for={perspective.name}
+                  >{perspective.name}</label
+                >
               </div>
             {/each}
           {/if}
-        {/await}
+        </div>
+      </div>
+      <div class="container my-4 menu-container">
+        <h2 class="my-2 text-center">Pages</h2>
+      </div>
+    </div>
+
+    <div
+      class="col-10 mh-100 pt-2 h-100"
+      style="overflow-x:scroll; height: 100vh"
+    >
+      <div class="container-fluid d-flex flex-column" style="height:100%">
+        <div class="row flex-nowrap h-100">
+          {#await phases}
+            <p>Waiting for data...</p>
+          {:then results}
+            {#if results != undefined}
+              {#each results as phase}
+                <!-- Create columns -->
+                <div class="col-12 col-md-10 col-lg-10 col-xl-8 mh-100 me-5" style="overflow-y:hidden">
+                  <h1>{phase.title}</h1>
+                  {#await allcards}
+                    <p>Loading...</p>
+                  {:then items}
+                    {#if items != undefined}
+                      <div
+                        class="container-fluid p-0 pe-2"
+                        style="height: 90%; width:100%; overflow-y:scroll; overflow-x:hidden;"
+                      >
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xxl-3 g-4">
+                          {#each items as item}
+                            {#if checkPhase(item, phase.tableid)}
+                              <Card {item} />
+                            {/if}
+                          {/each}
+                        </div>
+                      </div>
+                      <div
+                        style="box-shadow: 0px -7px 7px -10px; position:relative; z-index: 1000; width:100%; min-height:10px; clear:both"
+                      >
+                        &nbsp;
+                      </div>
+                    {/if}
+                  {/await}
+                </div>
+              {/each}
+            {/if}
+          {/await}
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<div id="test">
+  hello
 </div>
 
 <!-- Modal -->
@@ -390,19 +407,22 @@
         />
       </div>
       <div class="modal-body">
-        {#if items != undefined && items.length > 0}
-          <Masonry
-            {items}
-            {minColWidth}
-            {maxColWidth}
-            {gap}
-            let:item
-            bind:width
-            bind:height
-          >
-            <Card {item} />
-          </Masonry>
-        {/if}
+        {#await modalItems}
+          <p>Loading...</p>
+        {:then items}
+          {#if items != undefined}
+            <div
+              class="container-fluid p-0 pe-2"
+              style="height: 90%; width:100%; overflow-y:scroll; overflow-x:hidden;"
+            >
+              <div class="row row-cols-1 row-cols-md-3 g-4">
+                {#each items as item}
+                  <Card {item} />
+                {/each}
+              </div>
+            </div>
+          {/if}
+        {/await}
       </div>
     </div>
   </div>
