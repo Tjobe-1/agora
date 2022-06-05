@@ -53,20 +53,10 @@
       <!-- Meta -->
     </div>
 
-    <!-- <a
-        style=""
-        class="stretched-link"
-        data-bs-dismiss="modal"
-        data-bs-toggle="modal"
-        data-bs-target="#relationModal"
-        title={category}
-        item={JSON.stringify(item)}
-      /> -->
-
     <a
       style=""
       class="stretched-link"
-      href={"#table=" + item.table + "&id=" + item.tableid + "&title=" + item.title}
+      href={"#table=" + item.table + "&id=" + item.tableid}
     />
 
     {#if circles.length > 0}

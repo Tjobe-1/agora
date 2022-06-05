@@ -6,19 +6,29 @@
 
 .perspective-street {
   border: var(--card-border-width) solid var(--border-color);
-  background-color: #f15152;
+  background-color: #5dab7d;
+  background-image: url(/SVG/Street.svg);
+  background-repeat: no-repeat;
+  background-size: 50%;
 
 }
 
 .perspective-system {
   border: var(--card-border-width) solid var(--border-color);
-  background-color: #5dab7d;
-
+  background-color: #f15152;
+  background-image: url(/SVG/System.svg);
+  background-repeat: no-repeat;
+  background-position: 50% -40px;
+  background-size: 80%;
 }
 
 .perspective-outsider {
   border: var(--card-border-width) solid var(--border-color);
   background-color: #f59507;
+  background-image: url(/SVG/Outsider.svg);
+  background-repeat: no-repeat;
+  background-position: 50% -20px;
+  background-size: 100%;
 
 }
 
@@ -34,6 +44,7 @@
   display: inline-flex; /* or inline-flex */
   align-items: center; 
   justify-content: center;
+  background-image: none;
 }
 
 .btn-menu {
@@ -46,6 +57,16 @@
   background-color: var(--border-color);
   --bs-btn-active-bg: green;
 }
+
+.modal-content {
+  background-color: var(--bg);
+  border: var(--card-border-width) solid var(--border-color);
+}
+
+.modal-header {
+  border-bottom: var(--card-border-width) solid var(--border-color);
+}
+
 
 #menu {
   background-color: var(--bg);

@@ -1,1 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?><svg id="Layer_2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 202.42 73.23"><defs><style>.cls-1,.cls-2{font-family:ProximaNova-Black, 'Proxima Nova';font-size:58.68px;}.cls-1,.cls-3{fill:#5dab7d;}.cls-2{fill:none;stroke:#231f20;}.cls-4{fill:#f15152;}.cls-4,.cls-3,.cls-5{stroke:#000;stroke-miterlimit:10;}.cls-5{fill:#f59507;}</style></defs><g id="Layer_1-2"><g><text class="cls-1" transform="translate(35.81 49.38)"><tspan x="0" y="0">Agora</tspan></text><text class="cls-2" transform="translate(35.81 49.38)"><tspan x="0" y="0">Agora</tspan></text></g><polygon class="cls-4" points="29.95 49.38 44.38 10.24 31.53 10.24 17.1 49.38 29.95 49.38"/><polygon class="cls-3" points="47.66 49.38 62.09 10.24 49.24 10.24 34.81 49.38 47.66 49.38"/><polygon class="cls-5" points="13.57 49.38 28 10.24 15.15 10.24 .72 49.38 13.57 49.38"/></g></svg>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 26.3.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_2_00000143585808848336721660000006766377891887115956_"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 202.4 73.2"
+	 style="enable-background:new 0 0 202.4 73.2;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#5DAB7D;}
+	.st1{font-family:'ProximaNova-Black';}
+	.st2{font-size:58.68px;}
+	.st3{fill:none;stroke:#231F20;stroke-width:2;}
+	.st4{fill:#F15152;stroke:#000000;stroke-width:2;stroke-miterlimit:10;}
+	.st5{fill:#5DAB7D;stroke:#000000;stroke-width:2;stroke-miterlimit:10;}
+	.st6{fill:#F59507;stroke:#000000;stroke-width:2;stroke-miterlimit:10;}
+</style>
+<g id="Layer_1-2">
+	<g>
+		<text transform="matrix(1 0 0 1 35.81 49.38)" class="st0 st1 st2">Agora</text>
+		<text transform="matrix(1 0 0 1 35.81 49.38)" class="st3 st1 st2">Agora</text>
+	</g>
+	<polygon class="st4" points="30,49.4 44.4,10.2 31.5,10.2 17.1,49.4 	"/>
+	<polygon class="st5" points="47.7,49.4 62.1,10.2 49.2,10.2 34.8,49.4 	"/>
+	<polygon class="st6" points="13.6,49.4 28,10.2 15.1,10.2 0.7,49.4 	"/>
+</g>
+</svg>

@@ -71,6 +71,14 @@
       window.addEventListener("hashchange", (event) => {
         assembleModal(window.location.href);
       });
+
+      window.addEventListener("hide.bs.modal", (event) => {
+        window.location.hash = "#";
+        const backdrop = document.querySelectorAll("div.modal-backdrop");
+        if (backdrop.length > 0) {
+          backdrop[0].parentElement.removeChild(backdrop[0]);
+        }
+      });
     }
   });
 
@@ -244,32 +252,39 @@
     modalItems = undefined;
     modalItem = undefined;
 
+    const urlObj = new URL(url);
 
-    const urlObj = new URL(url)
-    let params = new URLSearchParams(urlObj.hash.substring(1))
+    if (urlObj.hash == "") {
+      return;
+    }
 
-    let table = params.get("table")
-    let id = params.get("id")
-    let title = params.get("title")
+    let params = new URLSearchParams(urlObj.hash.substring(1));
 
+    let table = params.get("table");
+    let id = params.get("id");
 
     var myModal = new bootstrap.Modal(
       document.getElementById("relationModal"),
       ""
     );
 
+    const backdrop = document.querySelectorAll("div.modal-backdrop");
     let modalTitle = relationModal.querySelector(".modal-title");
-    let modalBody = relationModal.querySelector(".modal-body ");
 
-    modalTitle.textContent = title;
-    myModal.show();
+    modalTitle.textContent = "Loading...";
 
-    const item = await getRow(table, id)
+    if (!myModal._isShown) {
+      if (backdrop.length > 0) {
+        backdrop[0].parentElement.removeChild(backdrop[0]);
+      }
+      myModal.show();
+    }
+
+    const item = await getRow(table, id);
     modalItem = await item;
-
+    modalTitle.textContent = modalItem.title;
 
     let pushItems = [];
-    
 
     for (var i = 0; i < item.relations.length; i++) {
       if (content_tables.includes(item.relations[i].table)) {
@@ -285,24 +300,21 @@
   }
 </script>
 
+
 <div class="container-fluid vh-100 d-flex flex-column">
   <div class="row flex-nowrap h-100">
-    <div class="col-2 mh-100 h-100" id="menu">
-      <object data={aroga_logo} width="100%" class="mt-2" />
+    <div class="col-8 col-sm-3 col-md-4 col-lg-2 mh-100 h-100 collapse show" id="menu">
+      <object data={aroga_logo} width="100%" class="mt-2" title="Logo"/>
       <div class="container menu-container">
         <h2 class="mt-2 text-center">Filter</h2>
-        <div
-          class="btn-toolbar mt-2"
-          role="toolbar"
-          aria-label="Toolbar with button groups"
-        >
+
           {#await categories}
             <p>waiting</p>
           {:then category}
             {#if category != undefined}
               {#each category as cat}
                 <div
-                  class="btn-group me-2 mb-2 flex-wrap"
+                  class="btn-group me-1 mb-1 flex-wrap"
                   role="group"
                   aria-label="First group"
                 >
@@ -320,7 +332,7 @@
               {/each}
             {/if}
           {/await}
-        </div>
+
         <div
           class="btn-toolbar my-4"
           role="toolbar"
@@ -329,7 +341,7 @@
           {#if perspectives != undefined}
             {#each perspectives as perspective}
               <div
-                class="btn-group me-2 mb-2 flex-wrap"
+                class="btn-group me-1 mb-1 flex-wrap"
                 role="group"
                 aria-label="Second group"
               >
@@ -355,11 +367,24 @@
     </div>
 
     <div
-      class="col-10 mh-100 pt-2 h-100"
+      class="col mh-100 pt-2 h-100"
       style="overflow-x:scroll; height: 100vh"
     >
+
+<div style="position: fixed">
+  <button
+    class="btn"
+    type="button"
+    data-bs-toggle="collapse"
+    data-bs-target="#menu"
+    aria-controls="navbarToggleExternalContent"
+    aria-expanded="true"
+    aria-label="Toggle navigation"
+    style="border: 2px solid black; background-color: #fff9f3"
+  ><i class="fa fa-bars"></i></button>
+</div>
       <div class="container-fluid d-flex flex-column" style="height:100%">
-        <div class="row flex-nowrap h-100">
+        <div class="row flex-nowrap mx-4 h-100">
           {#await phases}
             <p>Waiting for data...</p>
           {:then results}
@@ -426,6 +451,43 @@
         />
       </div>
       <div class="modal-body">
+        {#await modalItem}
+          <p>Loading...</p>
+        {:then item}
+          {#if item != undefined}
+            {#if item.meta.length > 0}
+              <div class="row">
+                {#each item.meta as meta}
+                  {#if meta.content != null}
+                    <div class="col-auto">
+                      <p>
+                        <strong>{meta.name + ":" + " " + meta.content}</strong>
+                      </p>
+                    </div>
+                  {/if}
+                {/each}
+              </div>
+            {/if}
+
+            <div class="row mb-3">
+              <div class="col">
+                <p>{item.text}</p>
+              </div>
+              <div class="col">
+                {#if item.image != ""}
+                  <img
+                    src={item.image}
+                    class="rounded"
+                    alt="relation"
+                    style="width: 100%; margin-right:10px"
+                  />
+                {/if}
+              </div>
+            </div>
+            <hr />
+          {/if}
+        {/await}
+
         {#await modalItems}
           <p>Loading...</p>
         {:then items}
@@ -440,6 +502,8 @@
                 {/each}
               </div>
             </div>
+          {:else}
+            <p class="text-center">Loading items...</p>
           {/if}
         {/await}
       </div>
