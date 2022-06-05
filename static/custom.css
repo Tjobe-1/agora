@@ -4,6 +4,18 @@
   --card-border-width: 2px;
 }
 
+#homeContainer {
+  position:absolute;
+  width: 80vh;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  border: var(--card-border-width) solid var(--border-color);
+  border-radius: 10px;
+  background-color: var(--bg);
+}
+
 .perspective-street {
   border: var(--card-border-width) solid var(--border-color);
   background-color: #5dab7d;

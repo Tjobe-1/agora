@@ -32,10 +32,12 @@
   "type": "module",
   "dependencies": {
     "@egjs/svelte-grid": "^1.10.1",
+    "@rollup/plugin-replace": "^4.0.0",
     "airtable": "^0.11.4",
     "axios": "^0.27.2",
     "svelte-bricks": "^0.1.7",
     "svelte-masonry-layout": "^0.0.7",
+    "svelte-typeform-embed": "^0.4.1",
     "sveltestrap": "^5.9.0"
   }
 }
