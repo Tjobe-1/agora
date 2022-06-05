@@ -300,38 +300,39 @@
   }
 </script>
 
-
 <div class="container-fluid vh-100 d-flex flex-column">
   <div class="row flex-nowrap h-100">
-    <div class="col-8 col-sm-3 col-md-4 col-lg-2 mh-100 h-100 collapse show" id="menu">
-      <object data={aroga_logo} width="100%" class="mt-2" title="Logo"/>
+    <div
+      class="col-8 col-sm-3 col-md-4 col-lg-2 mh-100 h-100 collapse show"
+      id="menu"
+    >
+      <object data={aroga_logo} width="100%" class="mt-2" title="Logo" />
       <div class="container menu-container">
         <h2 class="mt-2 text-center">Filter</h2>
 
-          {#await categories}
-            <p>waiting</p>
-          {:then category}
-            {#if category != undefined}
-              {#each category as cat}
-                <div
-                  class="btn-group me-1 mb-1 flex-wrap"
-                  role="group"
-                  aria-label="First group"
-                >
-                  <input
-                    type="checkbox"
-                    class="btn-check"
-                    id={cat.title}
-                    autocomplete="off"
-                    bind:group={selectedCheckbox}
-                    value={cat.tableid}
-                  />
-                  <label class="btn btn-menu" for={cat.title}>{cat.title}</label
-                  >
-                </div>
-              {/each}
-            {/if}
-          {/await}
+        {#await categories}
+          <p>waiting</p>
+        {:then category}
+          {#if category != undefined}
+            {#each category as cat}
+              <div
+                class="btn-group me-1 mb-1 flex-wrap"
+                role="group"
+                aria-label="First group"
+              >
+                <input
+                  type="checkbox"
+                  class="btn-check"
+                  id={cat.title}
+                  autocomplete="off"
+                  bind:group={selectedCheckbox}
+                  value={cat.tableid}
+                />
+                <label class="btn btn-menu" for={cat.title}>{cat.title}</label>
+              </div>
+            {/each}
+          {/if}
+        {/await}
 
         <div
           class="btn-toolbar my-4"
@@ -366,20 +367,20 @@
 
         <div class="d-grid gap-2">
           <a
-          href="/"
-          class="btn btn-menu"
-          tabindex="-1"
-          role="button"
-          aria-disabled="true">Home</a
-        >
-        <a
-        href="/opt-in"
-        class="btn btn-menu"
-        tabindex="-1"
-        role="button"
-        aria-disabled="true">Opt-in</a
-      >
-      <a
+            href="/"
+            class="btn btn-menu"
+            tabindex="-1"
+            role="button"
+            aria-disabled="true">Home</a
+          >
+          <a
+            href="/opt-in"
+            class="btn btn-menu"
+            tabindex="-1"
+            role="button"
+            aria-disabled="true">Opt-in</a
+          >
+          <a
             href="/"
             class="btn btn-menu"
             tabindex="-1"
@@ -387,28 +388,23 @@
             aria-disabled="true">About</a
           >
         </div>
-       
-
       </div>
     </div>
 
-    <div
-      class="col mh-100 pt-2 h-100"
-      style="overflow-x:scroll; height: 100vh"
-    >
-
-<div style="position: fixed">
-  <button
-    class="btn"
-    type="button"
-    data-bs-toggle="collapse"
-    data-bs-target="#menu"
-    aria-controls="navbarToggleExternalContent"
-    aria-expanded="true"
-    aria-label="Toggle navigation"
-    style="border: 2px solid black; background-color: #fff9f3"
-  ><i class="fa fa-bars"></i></button>
-</div>
+    <div class="col mh-100 pt-2 h-100" style="overflow-x:scroll; height: 100vh">
+      <div style="position: fixed">
+        <button
+          class="btn"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#menu"
+          aria-controls="navbarToggleExternalContent"
+          aria-expanded="true"
+          aria-label="Toggle navigation"
+          style="border: 2px solid black; background-color: #fff9f3"
+          ><i class="fa fa-bars" /></button
+        >
+      </div>
       <div class="container-fluid d-flex flex-column" style="height:100%">
         <div class="row flex-nowrap mx-4 h-100">
           {#await phases}
@@ -522,11 +518,26 @@
               class="container-fluid p-0 pe-2"
               style="height: 90%; width:100%; overflow-y:scroll; overflow-x:hidden;"
             >
-              <div class="row row-cols-1 row-cols-md-3 g-4">
-                {#each items as item}
-                  <Card {item} />
-                {/each}
-              </div>
+              {#await phases}
+                <p>Waiting for data...</p>
+              {:then results}
+                {#if results != undefined}
+                  {#each results as phase}
+                    <!-- Create columns -->
+
+                    <h1>{phase.title}</h1>
+                    <div class="row row-cols-1 row-cols-md-3 g-4">
+                      {#if items != undefined}
+                        {#each items as item}
+                          {#if checkPhase(item, phase.tableid)}
+                            <Card {item} />
+                          {/if}
+                        {/each}
+                      {/if}
+                    </div>
+                  {/each}
+                {/if}
+              {/await}
             </div>
           {:else}
             <p class="text-center">Loading items...</p>

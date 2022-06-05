@@ -1,6 +1,6 @@
 /** @type {import('@sveltejs/kit').Config} */
 
-import node from '@sveltejs/adapter-node';
+import node from '@sveltejs/adapter-auto';
 import preprocess from 'svelte-preprocess';
 
 
