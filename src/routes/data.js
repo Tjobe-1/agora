@@ -42,8 +42,8 @@ async function getFields(table, filter) {
 }
 
 async function processRows(table, filter, row) {
-  res = await getRows(table, filter, row);
-  returnData = [];
+  let res = await getRows(table, filter, row);
+  let returnData = [];
 
   if (!Array.isArray(res.data.results)) {
     res.data.results = [];
@@ -51,15 +51,15 @@ async function processRows(table, filter, row) {
   }
 
   res.data.results.forEach((element) => {
-    apObj = {};
-    meta = [];
-    relations = [];
+    let apObj = {};
+    let meta = [];
+    let relations = [];
 
     Object.keys(element).forEach(function (key) {
       if (key == "Title") {
         apObj.title = element[key];
       } else if (key.includes("Meta_")) {
-        meta_el = {};
+        let meta_el = {};
         meta_el.name = key.replace("Meta_", "");
         meta_el.content = element[key];
         meta.push(meta_el);
@@ -68,8 +68,8 @@ async function processRows(table, filter, row) {
       } else if (key == "Content_Image") {
         apObj.image = element[key];
       } else if (key.includes("Rel_")) {
-        relations_el = {};
-        keys = [];
+        let relations_el = {};
+        let keys = [];
         switch (key) {
           case "Rel_Phase":
             relations_el.table = 11;
@@ -89,7 +89,7 @@ async function processRows(table, filter, row) {
         }
 
         element[key].forEach((relation) => {
-          keys_content = {};
+          let keys_content = {};
           keys_content.id = relation.id;
           keys_content.title = relation.value;
           keys.push(keys_content);
@@ -124,7 +124,7 @@ export async function get(params) {
   let type = parameters.get("type");
   let table = parameters.get("table");
   let row = parameters.get("row");
-  res = "";
+  let res = "";
   let body_string ="";
 
   if (type == "rows") {

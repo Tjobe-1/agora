@@ -111,7 +111,7 @@
           params.append("filter", "");
           params.append("type", "fields");
           params.append("table", table);
-          var url = "/api/?";
+          var url = "/data?";
           const relation = await fetch(url + params.toString());
           return await relation.json();
         })
@@ -132,7 +132,7 @@
           element.keys.forEach((key) => {
             params.append("id", key.id);
           });
-          var url = "/api/?";
+          var url = "/data?";
           const relation = await fetch(url + params.toString());
           return relation.json();
         })
@@ -183,7 +183,7 @@
           params.append("filter", filter);
           params.append("type", "filter_rows");
           params.append("table", table);
-          var url = "/api/?";
+          var url = "/data?";
           const relation = await fetch(url + params.toString());
           return relation.json();
         })
@@ -213,7 +213,7 @@
       params.append("type", "rows");
       params.append("table", table);
 
-      var url = "/api/?";
+      var url = "/data?";
 
       const res_promise = await fetch(url + params.toString());
       return await res_promise.json();
@@ -228,7 +228,7 @@
       params.append("table", table);
       params.append("row", id);
 
-      var url = "/api/?";
+      var url = "/data?";
 
       const phases_promise = await fetch(url + params.toString());
       return await phases_promise.json();
