@@ -15,6 +15,8 @@
   let phases_table = 11;
   let categories_table = 10;
 
+  let first = true;
+
   let perspectives = [
     {
       name: "Street",
@@ -25,7 +27,7 @@
       table: 8,
     },
     {
-      name: "Outsider",
+      name: "Researcher",
       table: 9,
     },
   ];
@@ -38,6 +40,7 @@
   let modalItems;
   let modalItem;
   let selectedCheckbox = [];
+  let participant;
 
   let phasesFilter = [];
 
@@ -51,6 +54,13 @@
         obj.id = selection;
         phasesFilter.push(obj);
       });
+    }
+    if(participant != undefined) {
+      const part = {};
+      part.field = "Meta_Participant";
+      part.filter = "equal="
+      part.id = participant;
+      phasesFilter.push(part)
     }
   }
 
@@ -298,6 +308,13 @@
 
     modalItems = pushItems;
   }
+
+  async function handleOnSubmit(e) {
+    const formData = new FormData(e.target);
+    for (let field of formData) {
+      participant = field[1];
+    }
+  }
 </script>
 
 <div class="container-fluid vh-100 d-flex flex-column">
@@ -335,7 +352,7 @@
         {/await}
 
         <div
-          class="btn-toolbar my-4"
+          class="btn-toolbar my-2"
           role="toolbar"
           aria-label="Toolbar with button groups"
         >
@@ -360,11 +377,27 @@
               </div>
             {/each}
           {/if}
+
+          <div
+            class="btn-toolbar my-2"
+            role="toolbar"
+            aria-label="Toolbar with button groups"
+          >
+            <form on:submit|preventDefault={handleOnSubmit} class="d-flex">
+              <input
+                type="text"
+                id="participant"
+                name="participant"
+                value=""
+                class="form-control me-2"
+                placeholder="Participant"
+              />
+              <button type="submit" class="btn btn-menu">Go</button>
+            </form>
+          </div>
         </div>
       </div>
       <div class="container my-4 py-2 menu-container">
-        <h2 class="text-center">Pages</h2>
-
         <div class="d-grid gap-2">
           <a
             href="/"
@@ -506,7 +539,7 @@
                 {/if}
               </div>
             </div>
-            <hr />
+
           {/if}
         {/await}
 
@@ -514,31 +547,28 @@
           <p>Loading...</p>
         {:then items}
           {#if items != undefined}
-            <div
-              class="container-fluid p-0 pe-2"
-              style="height: 90%; width:100%; overflow-y:scroll; overflow-x:hidden;"
-            >
-              {#await phases}
-                <p>Waiting for data...</p>
-              {:then results}
-                {#if results != undefined}
-                  {#each results as phase}
-                    <!-- Create columns -->
+            {#await phases}
+              <p>Waiting for data...</p>
+            {:then results}
+              {#if results != undefined}
+                {#each results as phase}
+                  <!-- Create columns -->
+                  <hr/>
+                  <h1 class="text-center">{phase.title}</h1>
 
-                    <h1>{phase.title}</h1>
-                    <div class="row row-cols-1 row-cols-md-3 g-4">
-                      {#if items != undefined}
-                        {#each items as item}
-                          {#if checkPhase(item, phase.tableid)}
-                            <Card {item} />
-                          {/if}
-                        {/each}
-                      {/if}
-                    </div>
-                  {/each}
-                {/if}
-              {/await}
-            </div>
+                  <div class="row row-cols-1 row-cols-md-3 g-4 mb-2">
+                    {#if items != undefined}
+                      {#each items as item}
+                        {#if checkPhase(item, phase.tableid)}
+                          <Card {item} />
+                        {/if}
+                      {/each}
+                    {/if}
+                  </div>
+                  
+                {/each}
+              {/if}
+            {/await}
           {:else}
             <p class="text-center">Loading items...</p>
           {/if}
